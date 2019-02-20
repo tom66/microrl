@@ -18,15 +18,15 @@
  * parametrs-1, chars not added to command line.
  */
 #ifndef MICRORL_COMMAND_LINE_LEN
-#define MICRORL_COMMAND_LINE_LEN (1+100)
+#define MICRORL_COMMAND_LINE_LEN (1 + 100)
 #endif
 
 /*
- * Command token number, define max token it command line, if number of token 
+ * Command token number, define max token it command line, if number of token
  * typed in command line exceed this value, then prints message about it and
  * command line not to be parced and 'execute' callback will not calls.
  * Token is word separate by white space, for example 3 token line:
- * "IRin> set mode test" 
+ * "IRin> set mode test"
  */
 #ifndef MICRORL_COMMAND_TOKEN_NMB
 #define MICRORL_COMMAND_TOKEN_NMB 8
@@ -39,7 +39,7 @@
  */
 //#define MICRORL_PROMPT_DEFAULT "\033[32mIRin >\033[0m "	// green color
 #ifndef MICRORL_PROMPT_DEFAULT
-#define MICRORL_PROMPT_DEFAULT "\033[32mIRin >\033[0m "	// green color
+#define MICRORL_PROMPT_DEFAULT "\033[32mIRin >\033[0m " // green color
 #endif
 //#define MICRORL_PROMPT_DEFAULT "IRin > "
 
@@ -48,7 +48,7 @@
  * because if you use ESC sequence, it's not possible detect only text length
  */
 #ifndef MICRORL_PROMPT_LEN
-#define MICRORL_PROMPT_LEN       7
+#define MICRORL_PROMPT_LEN 7
 #endif
 
 /*
@@ -102,7 +102,7 @@
 #endif
 
 /*
- * Enable 'interrupt signal' callback, if user press Ctrl+C 
+ * Enable 'interrupt signal' callback, if user press Ctrl+C
  */
 #ifndef MICRORL_USE_CTRL_C
 #define MICRORL_USE_CTRL_C
@@ -112,16 +112,16 @@
  * Print prompt at 'microrl_init', if enable, prompt will print at startup,
  * otherwise first prompt will print after first press Enter in terminal NOTE!:
  * Enable it, if you call 'microrl_init' after your communication subsystem
- * already initialize and ready to print message 
+ * already initialize and ready to print message
  */
 #ifndef MICRORL_ENABLE_INIT_PROMPT
 #define MICRORL_ENABLE_INIT_PROMPT
 #endif
 
 /*
- * New line symbol 
+ * New line symbol
  */
-#if !defined(MICRORL_ENDL_CR) && !defined(MICRORL_ENDL_CRLF) && \
+#if !defined(MICRORL_ENDL_CR) && !defined(MICRORL_ENDL_CRLF) &&                \
 	!defined(MICRORL_ENDL_LF) && !defined(MICRORL_ENDL_LFCR)
 #define MICRORL_ENDL_LF
 #endif
@@ -140,9 +140,9 @@
 
 /***************************** END CONFIG SECTION *****************************/
 
-
 #if MICRORL_RING_HISTORY_LEN > 256
-#error "This history implementation (ring buffer with 1 byte iterator) allow 256 byte buffer size maximum"
+#error                                                                         \
+	"This history implementation (ring buffer with 1 byte iterator) allow 256 byte buffer size maximum"
 #endif
 
 #endif // MICRORL_CONFIG_H_
