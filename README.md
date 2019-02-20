@@ -115,14 +115,18 @@ int main (int argc, char ** argv)
 	// create microrl object and pointer on it
 	microrl_t rl;
 	microrl_t * prl = &rl;
-	// call init with ptr to microrl instance and print callback
-	microrl_init (prl, print);
-	// set callback for execute
-	microrl_set_execute_callback (prl, execute);
-	// set callback for completion (optionally)
-	microrl_set_complete_callback (prl, complet);
-	// set callback for ctrl+c handling (optionally)
-	microrl_set_sigint_callback (prl, sigint);
+	struct microrl_config config = {
+		// set print callback
+		.print = print,
+		// set callback for completion (optionally)
+		.get_completion = complet,
+		// set callback for execute
+		.execute = execute,
+		// set callback for ctrl+c handling (optionally)
+		.sigint = sigint
+	};
+	// call init with ptr to microrl instance and configuration
+	microrl_init (prl, &config);
 	
 	while (1) {
 		// put received char from stdin to microrl lib

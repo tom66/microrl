@@ -11,17 +11,19 @@ microrl_t * prl = &rl;
 int main (void/*int argc, char ** argv*/)
 {
 	init ();
-	// call init with ptr to microrl instance and print callback
-	microrl_init (prl, print);
+	struct microrl_config config = {
+		.print = print,
 	// set callback for execute
-	microrl_set_execute_callback (prl, execute);
-
+		.execute = execute,
 #ifdef MICRORL_USE_COMPLETE
 	// set callback for completion
-	microrl_set_complete_callback (prl, complet);
+		.get_completion = complet,
 #endif
 	// set callback for Ctrl+C
-	microrl_set_sigint_callback (prl, sigint);
+		.sigint = sigint
+	};
+	microrl_init (prl, &config);
+	microrl_set_execute_callback (prl, execute);
 	while (1) {
 		// put received char from stdin to microrl lib
 		microrl_insert_char (prl, get_char());

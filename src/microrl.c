@@ -63,8 +63,6 @@ BUGS and TODO:
 
 //#define DBG(...) fprintf(stderr, "\033[33m");fprintf(stderr,__VA_ARGS__);fprintf(stderr,"\033[0m");
 
-char * prompt_default = MICRORL_PROMPT_DEFAULT;
-
 #ifdef MICRORL_USE_HISTORY
 
 #ifdef _HISTORY_DEBUG
@@ -261,19 +259,19 @@ static int split (microrl_t * pThis, int limit, char const ** tkn_arr)
 //*****************************************************************************
 inline static void print_prompt (microrl_t * pThis)
 {
-	pThis->print (pThis->prompt_str);
+	pThis->config.print (pThis->config.prompt_str);
 }
 
 //*****************************************************************************
 inline static void terminal_backspace (microrl_t * pThis)
 {
-		pThis->print ("\033[D \033[D");
+	pThis->config.print ("\033[D \033[D");
 }
 
 //*****************************************************************************
 inline static void terminal_newline (microrl_t * pThis)
 {
-	pThis->print (MICRORL_ENDL);
+	pThis->config.print (MICRORL_ENDL);
 }
 
 #ifndef MICRORL_USE_LIBC_STDIO
@@ -322,7 +320,7 @@ static void terminal_move_cursor (microrl_t * pThis, int offset)
 	} else
 		return;
 #endif	
-	pThis->print (str);
+	pThis->config.print (str);
 }
 
 //*****************************************************************************
@@ -331,24 +329,23 @@ static void terminal_reset_cursor (microrl_t * pThis)
 	char str[16];
 #ifdef MICRORL_USE_LIBC_STDIO
 	snprintf (str, 16, "\033[%dD\033[%dC", \
-						MICRORL_COMMAND_LINE_LEN + MICRORL_PROMPT_LEN + 2, MICRORL_PROMPT_LEN);
-
+						MICRORL_COMMAND_LINE_LEN + pThis->config.prompt_length + 2, pThis->config.prompt_length);
 #else
 	char *endstr;
 	strcpy (str, "\033[");
-	endstr = u16bit_to_str ( MICRORL_COMMAND_LINE_LEN + MICRORL_PROMPT_LEN + 2,str+2);
+	endstr = u16bit_to_str ( MICRORL_COMMAND_LINE_LEN + pThis->config.prompt_length + 2,str+2);
 	strcpy (endstr, "D\033["); endstr += 3;
-	endstr = u16bit_to_str (MICRORL_PROMPT_LEN, endstr);
+	endstr = u16bit_to_str (pThis->config.prompt_length, endstr);
 	strcpy (endstr, "C");
 #endif
-	pThis->print (str);
+	pThis->config.print (str);
 }
 
 //*****************************************************************************
 // print cmdline to screen, replace '\0' to wihitespace 
 static void terminal_print_line (microrl_t * pThis, int pos, int cursor)
 {
-	pThis->print ("\033[K");    // delete all from cursor to end
+	pThis->config.print ("\033[K");    // delete all from cursor to end
 
 	char nch [] = {0,0};
 	int i;
@@ -356,7 +353,7 @@ static void terminal_print_line (microrl_t * pThis, int pos, int cursor)
 		nch [0] = pThis->cmdline [i];
 		if (nch[0] == '\0')
 			nch[0] = ' ';
-		pThis->print (nch);
+		pThis->config.print (nch);
 	}
 	
 	terminal_reset_cursor (pThis);
@@ -364,7 +361,7 @@ static void terminal_print_line (microrl_t * pThis, int pos, int cursor)
 }
 
 //*****************************************************************************
-void microrl_init (microrl_t * pThis, void (*print) (const char *)) 
+void microrl_init (microrl_t * pThis, struct microrl_config *config)
 {
 	memset(pThis->cmdline, 0, MICRORL_COMMAND_LINE_LEN);
 #ifdef MICRORL_USE_HISTORY
@@ -375,34 +372,38 @@ void microrl_init (microrl_t * pThis, void (*print) (const char *))
 #endif
 	pThis->cmdlen =0;
 	pThis->cursor = 0;
-	pThis->execute = NULL;
-	pThis->get_completion = NULL;
-#ifdef MICRORL_USE_CTRL_C
-	pThis->sigint = NULL;
-#endif
-	pThis->prompt_str = prompt_default;
-	pThis->print = print;
+	pThis->config = *config;
+	if (!pThis->config.prompt_str) {
+		pThis->config.prompt_str = MICRORL_PROMPT_DEFAULT;
+		pThis->config.prompt_length = MICRORL_PROMPT_LEN;
+	}
 #ifdef MICRORL_ENABLE_INIT_PROMPT
 	print_prompt (pThis);
 #endif
 }
 
+
+void microrl_set_prompt(microrl_t * pThis, char * prompt_str, uint8_t prompt_length)
+{
+	pThis->config.prompt_str = prompt_str;
+	pThis->config.prompt_length = prompt_length;
+}
 //*****************************************************************************
 void microrl_set_complete_callback (microrl_t * pThis, char ** (*get_completion)(int, const char* const*))
 {
-	pThis->get_completion = get_completion;
+	pThis->config.get_completion = get_completion;
 }
 
 //*****************************************************************************
 void microrl_set_execute_callback (microrl_t * pThis, int (*execute)(int, const char* const*))
 {
-	pThis->execute = execute;
+	pThis->config.execute = execute;
 }
 #ifdef MICRORL_USE_CTRL_C
 //*****************************************************************************
 void microrl_set_sigint_callback (microrl_t * pThis, void (*sigintf)(void))
 {
-	pThis->sigint = sigintf;
+	pThis->config.sigint = sigintf;
 }
 #endif
 
@@ -543,13 +544,13 @@ static void microrl_get_complite (microrl_t * pThis)
 	char const * tkn_arr[MICRORL_COMMAND_TOKEN_NMB];
 	char ** compl_token; 
 	
-	if (pThis->get_completion == NULL) // callback was not set
+	if (pThis->config.get_completion == NULL) // callback was not set
 		return;
 	
 	int status = split (pThis, pThis->cursor, tkn_arr);
 	if (pThis->cmdline[pThis->cursor-1] == '\0')
 		tkn_arr[status++] = "";
-	compl_token = pThis->get_completion (status, tkn_arr);
+	compl_token = pThis->config.get_completion (status, tkn_arr);
 	if (compl_token[0] != NULL) {
 		int i = 0;
 		int len;
@@ -560,8 +561,8 @@ static void microrl_get_complite (microrl_t * pThis)
 			len = common_len (compl_token);
 			terminal_newline (pThis);
 			while (compl_token [i] != NULL) {
-				pThis->print (compl_token[i]);
-				pThis->print (" ");
+				pThis->config.print (compl_token[i]);
+				pThis->config.print (" ");
 				i++;
 			}
 			terminal_newline (pThis);
@@ -593,11 +594,11 @@ void new_line_handler(microrl_t * pThis){
 	status = split (pThis, pThis->cmdlen, tkn_arr);
 	if (status == -1){
 		//          pThis->print ("ERROR: Max token amount exseed\n");
-		pThis->print ("ERROR:too many tokens");
-		pThis->print (MICRORL_ENDL);
+		pThis->config.print ("ERROR:too many tokens");
+		pThis->config.print (MICRORL_ENDL);
 	}
-	if ((status > 0) && (pThis->execute != NULL))
-		pThis->execute (status, tkn_arr);
+	if ((status > 0) && (pThis->config.execute != NULL))
+		pThis->config.execute (status, tkn_arr);
 	print_prompt (pThis);
 	pThis->cmdlen = 0;
 	pThis->cursor = 0;
@@ -669,7 +670,7 @@ void microrl_insert_char (microrl_t * pThis, int ch)
 			break;
 			//-----------------------------------------------------
 			case KEY_VT:  // ^K
-				pThis->print ("\033[K");
+				pThis->config.print ("\033[K");
 				pThis->cmdlen = pThis->cursor;
 			break;
 			//-----------------------------------------------------
@@ -724,8 +725,8 @@ void microrl_insert_char (microrl_t * pThis, int ch)
 			//-----------------------------------------------------
 #ifdef MICRORL_USE_CTRL_C
 			case KEY_ETX:
-			if (pThis->sigint != NULL)
-				pThis->sigint();
+			if (pThis->config.sigint != NULL)
+				pThis->config.sigint();
 			break;
 #endif
 			//-----------------------------------------------------
