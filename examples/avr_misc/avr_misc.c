@@ -153,7 +153,7 @@ int execute (int argc, const char * const * argv)
 	return 0;
 }
 
-#ifdef _USE_COMPLETE
+#ifdef MICRORL_USE_COMPLETE
 //*****************************************************************************
 // completion callback for microrl library
 char ** complet (int argc, const char * const * argv)

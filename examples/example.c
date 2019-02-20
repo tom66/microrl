@@ -16,7 +16,7 @@ int main (void/*int argc, char ** argv*/)
 	// set callback for execute
 	microrl_set_execute_callback (prl, execute);
 
-#ifdef _USE_COMPLETE
+#ifdef MICRORL_USE_COMPLETE
 	// set callback for completion
 	microrl_set_complete_callback (prl, complet);
 #endif
@@ -28,4 +28,3 @@ int main (void/*int argc, char ** argv*/)
 	}
 	return 0;
 }
-

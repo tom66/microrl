@@ -52,11 +52,11 @@
 #define _ESC_HOME     2
 #define _ESC_END      3
 
-#ifdef _USE_HISTORY
+#ifdef MICRORL_USE_HISTORY
 // history struct, contain internal variable
 // history store in static ring buffer for memory saving
 typedef struct {
-	char ring_buf [_RING_HISTORY_LEN];
+	char ring_buf [MICRORL_RING_HISTORY_LEN];
 	int begin;
 	int end;
 	int cur;
@@ -65,24 +65,24 @@ typedef struct {
 
 // microrl struct, contain internal library data
 typedef struct {
-#ifdef _USE_ESC_SEQ
+#ifdef MICRORL_USE_ESC_SEQ
 	char escape_seq;
 	char escape;
 #endif
-#if (defined(_ENDL_CRLF) || defined(_ENDL_LFCR))
+#if (defined(MICRORL_ENDL_CRLF) || defined(MICRORL_ENDL_LFCR))
 	char tmpch;
 #endif
-#ifdef _USE_HISTORY
+#ifdef MICRORL_USE_HISTORY
 	ring_history_t ring_hist;          // history object
 #endif
 	char * prompt_str;                 // pointer to prompt string
-	char cmdline [_COMMAND_LINE_LEN];  // cmdline buffer
+	char cmdline [MICRORL_COMMAND_LINE_LEN];  // cmdline buffer
 	int cmdlen;                        // last position in command line
 	int cursor;                        // input cursor
 	int (*execute) (int argc, const char * const * argv );            // ptr to 'execute' callback
 	char ** (*get_completion) (int argc, const char * const * argv ); // ptr to 'completion' callback
 	void (*print) (const char *);                                     // ptr to 'print' callback
-#ifdef _USE_CTLR_C
+#ifdef MICRORL_USE_CTRL_C
 	void (*sigint) (void);
 #endif
 } microrl_t;
@@ -107,7 +107,7 @@ void microrl_set_complete_callback (microrl_t * pThis, char ** (*get_completion)
 void microrl_set_execute_callback (microrl_t * pThis, int (*execute)(int, const char* const*));
 
 // set callback for Ctrl+C terminal signal
-#ifdef _USE_CTLR_C
+#ifdef MICRORL_USE_CTRL_C
 void microrl_set_sigint_callback (microrl_t * pThis, void (*sigintf)(void));
 #endif
 
