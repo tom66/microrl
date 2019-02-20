@@ -5,13 +5,15 @@ BUGS and TODO:
 -- rewrite history for use more than 256 byte buffer
 */
 
+#include "microrl.h"
+
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include "microrl.h"
 #ifdef MICRORL_USE_LIBC_STDIO
 #include <stdio.h>
 #endif
+#include <stdbool.h>
 
 //#define DBG(...) fprintf(stderr, "\033[33m");fprintf(stderr,__VA_ARGS__);fprintf(stderr,"\033[0m");
 
