@@ -99,7 +99,9 @@ terminated. So you can simply walk through argv and handle commands.
 `microrl_set_complete_callback` and set you callback. It also give 'argc' and
 'argv' arguments, so iterate through it and return set of complete variants. 
 
-5. Look at 'config.h' file, for tune library for you requiring. 
+5. Look at 'config.h' file.
+If you want to override some configuration, please compile with
+`MICRORL_INCLUDE_CONFIG_H` and provide a header file named `microrl_config.h`.
 
 6. Now you just call `microrl_insert_char` on each char received from input
 stream (usart, network, etc).
