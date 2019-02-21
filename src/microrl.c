@@ -547,7 +547,9 @@ static void microrl_get_complite(microrl_t *pThis) {
 			terminal_newline(pThis);
 			while (compl_token[i] != NULL) {
 				pThis->config.print(compl_token[i]);
-				pThis->config.print(" ");
+				if (compl_token[i + 1] != NULL) {
+					pThis->config.print(" ");
+				}
 				i++;
 			}
 			terminal_newline(pThis);
