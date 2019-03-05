@@ -709,6 +709,12 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 			terminal_reset_cursor(pThis);
 			terminal_print_line(pThis, 0, pThis->cursor);
 			break;
+		case KEY_FF: // ^L
+			pThis->config.print("\033[2J\033[H");
+			print_prompt(pThis);
+			terminal_reset_cursor(pThis);
+			terminal_print_line(pThis, 0, pThis->cursor);
+			break;
 			//-----------------------------------------------------
 #ifdef MICRORL_USE_CTRL_C
 		case KEY_ETX:
