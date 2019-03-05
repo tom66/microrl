@@ -4,6 +4,7 @@
 #include "config.h"
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef MICRORL_USE_HISTORY
 // history struct, contain internal variable
@@ -40,6 +41,9 @@ typedef struct {
 #endif
 #ifdef MICRORL_USE_HISTORY
 	ring_history_t ring_hist; // history object
+#endif
+#ifdef MICRORL_USE_CTRL_C
+	bool pending_execution;
 #endif
 	char cmdline[MICRORL_COMMAND_LINE_LEN]; // cmdline buffer
 	int cmdlen;								// last position in command line

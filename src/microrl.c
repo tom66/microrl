@@ -569,24 +569,35 @@ static void microrl_get_complite(microrl_t *pThis) {
 }
 #endif
 
-//*****************************************************************************
-void new_line_handler(microrl_t *pThis) {
+/**
+ * \brief Newline keys (Ctrl-C, endl, etc.) handler
+ *
+ * \param pThis handle of a microrl instance
+ * \param execute whether the inserted implies an execution or not.
+ * If true, the current input line will be parsed and executed (when valid).
+ * If false, the current input line is just discarded.
+ */
+static void new_line_handler(microrl_t *pThis, bool execute) {
 	char const *tkn_arr[MICRORL_COMMAND_TOKEN_NMB];
 	int status;
 
 	terminal_newline(pThis);
+	if (execute) {
 #ifdef MICRORL_USE_HISTORY
-	if (pThis->cmdlen > 0)
-		hist_save_line(&pThis->ring_hist, pThis->cmdline, pThis->cmdlen);
+		if (pThis->cmdlen > 0)
+			hist_save_line(&pThis->ring_hist, pThis->cmdline, pThis->cmdlen);
 #endif
-	status = split(pThis, pThis->cmdlen, tkn_arr);
-	if (status == -1) {
-		//          pThis->print ("ERROR: Max token amount exseed\n");
-		pThis->config.print("ERROR:too many tokens");
-		pThis->config.print(MICRORL_ENDL);
+		status = split(pThis, pThis->cmdlen, tkn_arr);
+		if (status == -1) {
+			//          pThis->print ("ERROR: Max token amount exseed\n");
+			pThis->config.print("ERROR:too many tokens");
+			pThis->config.print(MICRORL_ENDL);
+		}
+		if ((status > 0) && (pThis->config.execute != NULL)) {
+			pThis->pending_execution = true;
+			pThis->config.execute(status, tkn_arr);
+		}
 	}
-	if ((status > 0) && (pThis->config.execute != NULL))
-		pThis->config.execute(status, tkn_arr);
 	print_prompt(pThis);
 	pThis->cmdlen = 0;
 	pThis->cursor = 0;
@@ -609,7 +620,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 			//-----------------------------------------------------
 #ifdef MICRORL_ENDL_CR
 		case KEY_CR:
-			new_line_handler(pThis);
+			new_line_handler(pThis, true);
 			break;
 		case KEY_LF:
 			break;
@@ -619,7 +630,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 		break;
 	case KEY_LF:
 		if (pThis->tmpch == KEY_CR)
-			new_line_handler(pThis);
+			new_line_handler(pThis, true);
 		break;
 #elif defined(MICRORL_ENDL_LFCR)
 	case KEY_LF:
@@ -627,13 +638,13 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 		break;
 	case KEY_CR:
 		if (pThis->tmpch == KEY_LF)
-			new_line_handler(pThis);
+			new_line_handler(pThis, true);
 		break;
 #else
 	case KEY_CR:
 		break;
 	case KEY_LF:
-		new_line_handler(pThis);
+		new_line_handler(pThis, true);
 		break;
 #endif
 			//-----------------------------------------------------
@@ -716,12 +727,19 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 			terminal_print_line(pThis, 0, pThis->cursor);
 			break;
 			//-----------------------------------------------------
-#ifdef MICRORL_USE_CTRL_C
 		case KEY_ETX:
-			if (pThis->config.sigint != NULL)
-				pThis->config.sigint();
-			break;
+#ifdef MICRORL_USE_CTRL_C
+			if (pThis->pending_execution) {
+				if (pThis->config.sigint != NULL)
+					pThis->config.sigint();
+				pThis->pending_execution = false;
+			} else {
+				new_line_handler(pThis, false);
+			}
+#else
+			new_line_handler(pThis, false);
 #endif
+			break;
 		//-----------------------------------------------------
 		default:
 			if (((ch == ' ') && (pThis->cmdlen == 0)) || IS_CONTROL_CHAR(ch))
