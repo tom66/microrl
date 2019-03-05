@@ -666,6 +666,20 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 			}
 			terminal_print_line(pThis, 0, pThis->cursor);
 			break;
+		case KEY_ETB: // ^W (cut word)
+		{
+			bool hit_word = false;
+			while (pThis->cursor > 0) {
+				if (isalnum(pThis->cmdline[pThis->cursor - 1])) {
+					hit_word = true;
+				}
+				if (pThis->cmdline[pThis->cursor - 1] == '\0' && hit_word) {
+					break;
+				}
+				microrl_backspace(pThis);
+			}
+			terminal_print_line(pThis, pThis->cursor, pThis->cursor);
+		} break;
 		//-----------------------------------------------------
 		case KEY_VT: // ^K
 			pThis->config.print("\033[K");
