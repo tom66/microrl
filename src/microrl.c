@@ -365,6 +365,9 @@ void microrl_init(microrl_t *pThis, struct microrl_config *config) {
 	pThis->ring_hist.end = 0;
 	pThis->ring_hist.cur = 0;
 #endif
+#ifdef MICRORL_USE_ESC_SEQ
+	pThis->escape = 0;
+#endif
 	pThis->cmdlen = 0;
 	pThis->cursor = 0;
 	pThis->config = *config;
@@ -647,7 +650,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 		new_line_handler(pThis, true);
 		break;
 #endif
-	//-----------------------------------------------------
+			//-----------------------------------------------------
 #ifdef MICRORL_USE_COMPLETE
 		case KEY_HT:
 			microrl_get_complite(pThis);
