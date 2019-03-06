@@ -528,7 +528,7 @@ static int common_len(char **arr) {
 }
 
 //*****************************************************************************
-static void microrl_get_complite(microrl_t *pThis) {
+static void microrl_get_complete(microrl_t *pThis) {
 	char const *tkn_arr[MICRORL_COMMAND_TOKEN_NMB];
 	char **compl_token;
 
@@ -536,7 +536,7 @@ static void microrl_get_complite(microrl_t *pThis) {
 		return;
 
 	int status = split(pThis, pThis->cursor, tkn_arr);
-	if (pThis->cmdline[pThis->cursor - 1] == '\0')
+	if (pThis->cmdline[pThis->cursor > 0 ? pThis->cursor - 1 : 0] == '\0')
 		tkn_arr[status++] = "";
 	compl_token = pThis->config.get_completion(status, tkn_arr);
 	if (compl_token[0] != NULL) {
@@ -653,7 +653,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 			//-----------------------------------------------------
 #ifdef MICRORL_USE_COMPLETE
 		case KEY_HT:
-			microrl_get_complite(pThis);
+			microrl_get_complete(pThis);
 			break;
 #endif
 		//-----------------------------------------------------
