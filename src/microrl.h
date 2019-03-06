@@ -3,8 +3,8 @@
 
 #include "config.h"
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef MICRORL_USE_HISTORY
 // history struct, contain internal variable
@@ -28,6 +28,10 @@ struct microrl_config {
 #ifdef MICRORL_USE_CTRL_C
 	void (*sigint)(void);
 #endif
+	/**
+	 * \brief Callback called when the EOT key is received.
+	 */
+	void (*eof)(void);
 };
 
 // microrl struct, contain internal library data

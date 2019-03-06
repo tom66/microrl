@@ -647,7 +647,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 		new_line_handler(pThis, true);
 		break;
 #endif
-			//-----------------------------------------------------
+	//-----------------------------------------------------
 #ifdef MICRORL_USE_COMPLETE
 		case KEY_HT:
 			microrl_get_complite(pThis);
@@ -740,7 +740,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 			terminal_reset_cursor(pThis);
 			terminal_print_line(pThis, 0, pThis->cursor);
 			break;
-			//-----------------------------------------------------
+		//-----------------------------------------------------
 		case KEY_ETX:
 #ifdef MICRORL_USE_CTRL_C
 			if (pThis->pending_execution) {
@@ -751,8 +751,14 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 				new_line_handler(pThis, false);
 			}
 #else
-			new_line_handler(pThis, false);
+		new_line_handler(pThis, false);
 #endif
+			break;
+		//-----------------------------------------------------
+		case KEY_EOT:
+			if (pThis->config.eof != NULL) {
+				pThis->config.eof();
+			}
 			break;
 		//-----------------------------------------------------
 		default:
