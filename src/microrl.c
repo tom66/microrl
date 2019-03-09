@@ -229,7 +229,7 @@ static int hist_restore_line(ring_history_t *pThis, char *line, int dir) {
 
 //*****************************************************************************
 // split cmdline to tkn array and return nmb of token
-static int split(microrl_t *pThis, int limit, char const **tkn_arr) {
+static int split(microrl_t *pThis, int limit, const char **tkn_arr) {
 	int i = 0;
 	int ind = 0;
 	while (1) {
@@ -380,20 +380,21 @@ void microrl_init(microrl_t *pThis, struct microrl_config *config) {
 #endif
 }
 
-void microrl_set_prompt(microrl_t *pThis, char *prompt_str,
+void microrl_set_prompt(microrl_t *pThis, const char *prompt_str,
 						uint8_t prompt_length) {
 	pThis->config.prompt_str = prompt_str;
 	pThis->config.prompt_length = prompt_length;
 }
 //*****************************************************************************
 void microrl_set_complete_callback(
-	microrl_t *pThis, char **(*get_completion)(int, const char *const *)) {
+	microrl_t *pThis,
+	const char **(*get_completion)(int, const char *const *)) {
 	pThis->config.get_completion = get_completion;
 }
 
 //*****************************************************************************
 void microrl_set_execute_callback(microrl_t *pThis,
-								  int (*execute)(int, const char *const *)) {
+								  int (*execute)(int, char **)) {
 	pThis->config.execute = execute;
 }
 #ifdef MICRORL_USE_CTRL_C
@@ -471,7 +472,7 @@ static int escape_process(microrl_t *pThis, char ch) {
 
 //*****************************************************************************
 // insert len char of text at cursor position
-static int microrl_insert_text(microrl_t *pThis, char *text, int len) {
+static int microrl_insert_text(microrl_t *pThis, const char *text, int len) {
 	int i;
 	if (pThis->cmdlen + len < MICRORL_COMMAND_LINE_LEN) {
 		memmove(pThis->cmdline + pThis->cursor + len,
@@ -507,10 +508,10 @@ static void microrl_backspace(microrl_t *pThis) {
 #ifdef MICRORL_USE_COMPLETE
 
 //*****************************************************************************
-static int common_len(char **arr) {
+static int common_len(const char **arr) {
 	int i;
 	int j;
-	char *shortest = arr[0];
+	const char *shortest = arr[0];
 	int shortlen = strlen(shortest);
 
 	for (i = 0; arr[i] != NULL; ++i)
@@ -530,7 +531,7 @@ static int common_len(char **arr) {
 //*****************************************************************************
 static void microrl_get_complete(microrl_t *pThis) {
 	char const *tkn_arr[MICRORL_COMMAND_TOKEN_NMB];
-	char **compl_token;
+	const char **compl_token;
 
 	if (pThis->config.get_completion == NULL) // callback was not set
 		return;
@@ -581,7 +582,7 @@ static void microrl_get_complete(microrl_t *pThis) {
  * If false, the current input line is just discarded.
  */
 static void new_line_handler(microrl_t *pThis, bool execute) {
-	char const *tkn_arr[MICRORL_COMMAND_TOKEN_NMB];
+	char *tkn_arr[MICRORL_COMMAND_TOKEN_NMB];
 	int status;
 
 	terminal_newline(pThis);
@@ -590,7 +591,7 @@ static void new_line_handler(microrl_t *pThis, bool execute) {
 		if (pThis->cmdlen > 0)
 			hist_save_line(&pThis->ring_hist, pThis->cmdline, pThis->cmdlen);
 #endif
-		status = split(pThis, pThis->cmdlen, tkn_arr);
+		status = split(pThis, pThis->cmdlen, (const char **)tkn_arr);
 		if (status == -1) {
 			//          pThis->print ("ERROR: Max token amount exseed\n");
 			pThis->config.print("ERROR:too many tokens");

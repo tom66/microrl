@@ -18,11 +18,10 @@ typedef struct {
 #endif
 
 struct microrl_config {
-	char *prompt_str; // pointer to prompt string
+	const char *prompt_str; // pointer to prompt string
 	uint8_t prompt_length;
-	int (*execute)(int argc,
-				   const char *const *argv); // ptr to 'execute' callback
-	char **(*get_completion)(
+	int (*execute)(int argc, char **argv); // ptr to 'execute' callback
+	const char **(*get_completion)(
 		int argc, const char *const *argv); // ptr to 'completion' callback
 	void (*print)(const char *);			// ptr to 'print' callback
 #ifdef MICRORL_USE_CTRL_C
@@ -62,7 +61,7 @@ void microrl_init(microrl_t *pThis, struct microrl_config *config);
 // echo mode will enabled after user press Enter.
 void microrl_set_echo(int);
 
-void microrl_set_prompt(microrl_t *pThis, char *prompt_str,
+void microrl_set_prompt(microrl_t *pThis, const char *prompt_str,
 						uint8_t prompt_length);
 // set pointer to callback complition func, that called when user press 'Tab'
 // callback func description:
@@ -72,13 +71,13 @@ void microrl_set_prompt(microrl_t *pThis, char *prompt_str,
 //   be complitted Empty string if complite not found, and multiple string if
 //   there are some token
 void microrl_set_complete_callback(
-	microrl_t *pThis, char **(*get_completion)(int, const char *const *));
+	microrl_t *pThis, const char **(*get_completion)(int, const char *const *));
 
 // pointer to callback func, that called when user press 'Enter'
 // execute func param: argc - argument count, argv - pointer array to token
 // string
 void microrl_set_execute_callback(microrl_t *pThis,
-								  int (*execute)(int, const char *const *));
+								  int (*execute)(int, char **));
 
 // set callback for Ctrl+C terminal signal
 #ifdef MICRORL_USE_CTRL_C
