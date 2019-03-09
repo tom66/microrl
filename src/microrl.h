@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 // history struct, contain internal variable
 // history store in static ring buffer for memory saving
 typedef struct {
@@ -42,7 +42,7 @@ typedef struct {
 #if (defined(MICRORL_ENDL_CRLF) || defined(MICRORL_ENDL_LFCR))
 	char tmpch;
 #endif
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 	ring_history_t ring_hist; // history object
 #endif
 #ifdef MICRORL_USE_CTRL_C
@@ -63,6 +63,7 @@ void microrl_set_echo(int);
 
 void microrl_set_prompt(microrl_t *pThis, const char *prompt_str,
 						uint8_t prompt_length);
+#if MICRORL_USE_COMPLETE
 // set pointer to callback complition func, that called when user press 'Tab'
 // callback func description:
 //   param: argc - argument count, argv - pointer array to token string
@@ -72,6 +73,7 @@ void microrl_set_prompt(microrl_t *pThis, const char *prompt_str,
 //   there are some token
 void microrl_set_complete_callback(
 	microrl_t *pThis, const char **(*get_completion)(int, const char *const *));
+#endif
 
 // pointer to callback func, that called when user press 'Enter'
 // execute func param: argc - argument count, argv - pointer array to token

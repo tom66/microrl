@@ -59,7 +59,7 @@
  * define.
  */
 #ifndef MICRORL_USE_COMPLETE
-#define MICRORL_USE_COMPLETE
+#define MICRORL_USE_COMPLETE 1
 #endif
 
 /*
@@ -68,7 +68,7 @@
  * memory consuming, depends from MICRORL_RING_HISTORY_LEN parametr
  */
 #ifndef MICRORL_USE_HISTORY
-#define MICRORL_USE_HISTORY
+#define MICRORL_USE_HISTORY 1
 #endif
 
 /*

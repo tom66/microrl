@@ -66,7 +66,7 @@ BUGS and TODO:
 //#define DBG(...) fprintf(stderr,
 //"\033[33m");fprintf(stderr,__VA_ARGS__);fprintf(stderr,"\033[0m");
 
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 
 #ifdef _HISTORY_DEBUG
 //*****************************************************************************
@@ -359,7 +359,7 @@ static void terminal_print_line(microrl_t *pThis, int pos, int cursor) {
 //*****************************************************************************
 void microrl_init(microrl_t *pThis, struct microrl_config *config) {
 	memset(pThis->cmdline, 0, MICRORL_COMMAND_LINE_LEN);
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 	memset(pThis->ring_hist.ring_buf, 0, MICRORL_RING_HISTORY_LEN);
 	pThis->ring_hist.begin = 0;
 	pThis->ring_hist.end = 0;
@@ -404,7 +404,7 @@ void microrl_set_sigint_callback(microrl_t *pThis, void (*sigintf)(void)) {
 }
 #endif
 
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 static void hist_search(microrl_t *pThis, int dir) {
 	int len = hist_restore_line(&pThis->ring_hist, pThis->cmdline, dir);
 	if (len >= 0) {
@@ -425,12 +425,12 @@ static int escape_process(microrl_t *pThis, char ch) {
 		return 0;
 	} else if (pThis->escape_seq == _ESC_BRACKET) {
 		if (ch == 'A') {
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 			hist_search(pThis, _HIST_UP);
 #endif
 			return 1;
 		} else if (ch == 'B') {
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 			hist_search(pThis, _HIST_DOWN);
 #endif
 			return 1;
@@ -505,7 +505,7 @@ static void microrl_backspace(microrl_t *pThis) {
 	}
 }
 
-#ifdef MICRORL_USE_COMPLETE
+#if MICRORL_USE_COMPLETE
 
 //*****************************************************************************
 static int common_len(const char **arr) {
@@ -587,7 +587,7 @@ static void new_line_handler(microrl_t *pThis, bool execute) {
 
 	terminal_newline(pThis);
 	if (execute) {
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 		if (pThis->cmdlen > 0)
 			hist_save_line(&pThis->ring_hist, pThis->cmdline, pThis->cmdlen);
 #endif
@@ -606,7 +606,7 @@ static void new_line_handler(microrl_t *pThis, bool execute) {
 	pThis->cmdlen = 0;
 	pThis->cursor = 0;
 	memset(pThis->cmdline, 0, MICRORL_COMMAND_LINE_LEN);
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 	pThis->ring_hist.cur = 0;
 #endif
 }
@@ -652,7 +652,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 		break;
 #endif
 			//-----------------------------------------------------
-#ifdef MICRORL_USE_COMPLETE
+#if MICRORL_USE_COMPLETE
 		case KEY_HT:
 			microrl_get_complete(pThis);
 			break;
@@ -715,13 +715,13 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 			break;
 		//-----------------------------------------------------
 		case KEY_DLE: //^P
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 			hist_search(pThis, _HIST_UP);
 #endif
 			break;
 		//-----------------------------------------------------
 		case KEY_SO: //^N
-#ifdef MICRORL_USE_HISTORY
+#if MICRORL_USE_HISTORY
 			hist_search(pThis, _HIST_DOWN);
 #endif
 			break;
