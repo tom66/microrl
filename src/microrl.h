@@ -20,17 +20,35 @@ typedef struct {
 struct microrl_config {
 	const char *prompt_str; // pointer to prompt string
 	uint8_t prompt_length;
-	int (*execute)(int argc, char **argv); // ptr to 'execute' callback
-	const char **(*get_completion)(
-		int argc, const char *const *argv); // ptr to 'completion' callback
-	void (*print)(const char *);			// ptr to 'print' callback
+	/**
+	 * \brief Userspace cmdline execution callback (called when newline is
+	 * received)
+	 */
+	int (*execute)(void *userdata, int argc, char **argv);
+	/**
+	 * \brief Userspace completion retrieval callback (called when <TAB> is
+	 * received)
+	 */
+	const char **(*get_completion)(void *userdata, int argc,
+								   const char *const *argv);
+	/**
+	 * \brief Userspace print callback
+	 */
+	void (*print)(const char *);
 #ifdef MICRORL_USE_CTRL_C
-	void (*sigint)(void);
+	/**
+	 * \brief Userspace SIGINT handler
+	 */
+	void (*sigint)(void *userdata);
 #endif
 	/**
-	 * \brief Callback called when the EOT key is received.
+	 * \brief Userspace EOF handler
 	 */
-	void (*eof)(void);
+	void (*eof)(void *userdata);
+	/**
+	 * \brief User data
+	 */
+	void *userdata;
 };
 
 // microrl struct, contain internal library data
@@ -72,18 +90,19 @@ void microrl_set_prompt(microrl_t *pThis, const char *prompt_str,
 //   be complitted Empty string if complite not found, and multiple string if
 //   there are some token
 void microrl_set_complete_callback(
-	microrl_t *pThis, const char **(*get_completion)(int, const char *const *));
+	microrl_t *pThis, const char **(*get_completion)(void *, int, const char *const *));
 #endif
 
 // pointer to callback func, that called when user press 'Enter'
 // execute func param: argc - argument count, argv - pointer array to token
 // string
 void microrl_set_execute_callback(microrl_t *pThis,
-								  int (*execute)(int, char **));
+								  int (*execute)(void *, int, char **));
 
 // set callback for Ctrl+C terminal signal
 #ifdef MICRORL_USE_CTRL_C
-void microrl_set_sigint_callback(microrl_t *pThis, void (*sigintf)(void));
+void microrl_set_sigint_callback(microrl_t *pThis,
+								 void (*sigint)(void *userdata));
 #endif
 
 // insert char to cmdline (for example call in usart RX interrupt)

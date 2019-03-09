@@ -388,19 +388,20 @@ void microrl_set_prompt(microrl_t *pThis, const char *prompt_str,
 //*****************************************************************************
 void microrl_set_complete_callback(
 	microrl_t *pThis,
-	const char **(*get_completion)(int, const char *const *)) {
+	const char **(*get_completion)(void *userdata, int, const char *const *)) {
 	pThis->config.get_completion = get_completion;
 }
 
 //*****************************************************************************
 void microrl_set_execute_callback(microrl_t *pThis,
-								  int (*execute)(int, char **)) {
+								  int (*execute)(void *, int, char **)) {
 	pThis->config.execute = execute;
 }
 #ifdef MICRORL_USE_CTRL_C
 //*****************************************************************************
-void microrl_set_sigint_callback(microrl_t *pThis, void (*sigintf)(void)) {
-	pThis->config.sigint = sigintf;
+void microrl_set_sigint_callback(microrl_t *pThis,
+								 void (*sigint)(void *userdata)) {
+	pThis->config.sigint = sigint;
 }
 #endif
 
@@ -539,7 +540,8 @@ static void microrl_get_complete(microrl_t *pThis) {
 	int status = split(pThis, pThis->cursor, tkn_arr);
 	if (pThis->cmdline[pThis->cursor > 0 ? pThis->cursor - 1 : 0] == '\0')
 		tkn_arr[status++] = "";
-	compl_token = pThis->config.get_completion(status, tkn_arr);
+	compl_token =
+		pThis->config.get_completion(pThis->config.userdata, status, tkn_arr);
 	if (compl_token[0] != NULL) {
 		int i = 0;
 		int len;
@@ -599,7 +601,7 @@ static void new_line_handler(microrl_t *pThis, bool execute) {
 		}
 		if ((status > 0) && (pThis->config.execute != NULL)) {
 			pThis->pending_execution = true;
-			pThis->config.execute(status, tkn_arr);
+			pThis->config.execute(pThis->config.userdata, status, tkn_arr);
 		}
 	}
 	print_prompt(pThis);
@@ -749,7 +751,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 #ifdef MICRORL_USE_CTRL_C
 			if (pThis->pending_execution) {
 				if (pThis->config.sigint != NULL)
-					pThis->config.sigint();
+					pThis->config.sigint(pThis->config.userdata);
 				pThis->pending_execution = false;
 			} else {
 				new_line_handler(pThis, false);
@@ -761,7 +763,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 		//-----------------------------------------------------
 		case KEY_EOT:
 			if (pThis->config.eof != NULL) {
-				pThis->config.eof();
+				pThis->config.eof(pThis->config.userdata);
 			}
 			break;
 		//-----------------------------------------------------
