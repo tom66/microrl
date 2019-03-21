@@ -35,7 +35,7 @@ struct microrl_config {
 	 * \brief Userspace print callback
 	 */
 	void (*print)(const char *);
-#ifdef MICRORL_USE_CTRL_C
+#if MICRORL_USE_CTRL_C
 	/**
 	 * \brief Userspace SIGINT handler
 	 */
@@ -53,7 +53,7 @@ struct microrl_config {
 
 // microrl struct, contain internal library data
 typedef struct {
-#ifdef MICRORL_USE_ESC_SEQ
+#if MICRORL_USE_ESC_SEQ
 	char escape_seq;
 	char escape;
 #endif
@@ -63,7 +63,7 @@ typedef struct {
 #if MICRORL_USE_HISTORY
 	ring_history_t ring_hist; // history object
 #endif
-#ifdef MICRORL_USE_CTRL_C
+#if MICRORL_USE_CTRL_C
 	bool pending_execution;
 #endif
 	char cmdline[MICRORL_COMMAND_LINE_LEN]; // cmdline buffer
@@ -90,7 +90,8 @@ void microrl_set_prompt(microrl_t *pThis, const char *prompt_str,
 //   be complitted Empty string if complite not found, and multiple string if
 //   there are some token
 void microrl_set_complete_callback(
-	microrl_t *pThis, const char **(*get_completion)(void *, int, const char *const *));
+	microrl_t *pThis,
+	const char **(*get_completion)(void *, int, const char *const *));
 #endif
 
 // pointer to callback func, that called when user press 'Enter'
@@ -100,7 +101,7 @@ void microrl_set_execute_callback(microrl_t *pThis,
 								  int (*execute)(void *, int, char **));
 
 // set callback for Ctrl+C terminal signal
-#ifdef MICRORL_USE_CTRL_C
+#if MICRORL_USE_CTRL_C
 void microrl_set_sigint_callback(microrl_t *pThis,
 								 void (*sigint)(void *userdata));
 #endif

@@ -10,7 +10,7 @@ BUGS and TODO:
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef MICRORL_USE_LIBC_STDIO
+#if MICRORL_USE_LIBC_STDIO
 #include <stdio.h>
 #endif
 #include <stdbool.h>
@@ -268,7 +268,7 @@ inline static void terminal_newline(microrl_t *pThis) {
 	pThis->config.print(MICRORL_ENDL);
 }
 
-#ifndef MICRORL_USE_LIBC_STDIO
+#if !MICRORL_USE_LIBC_STDIO
 //*****************************************************************************
 // convert 16 bit value to string
 // 0 value not supported!!! just make empty string
@@ -297,7 +297,7 @@ static void terminal_move_cursor(microrl_t *pThis, int offset) {
 	char str[16] = {
 		0,
 	};
-#ifdef MICRORL_USE_LIBC_STDIO
+#if MICRORL_USE_LIBC_STDIO
 	if (offset > 0) {
 		snprintf(str, 16, "\033[%dC", offset);
 	} else if (offset < 0) {
@@ -321,7 +321,7 @@ static void terminal_move_cursor(microrl_t *pThis, int offset) {
 //*****************************************************************************
 static void terminal_reset_cursor(microrl_t *pThis) {
 	char str[16];
-#ifdef MICRORL_USE_LIBC_STDIO
+#if MICRORL_USE_LIBC_STDIO
 	snprintf(str, 16, "\033[%dD\033[%dC",
 			 MICRORL_COMMAND_LINE_LEN + pThis->config.prompt_length + 2,
 			 pThis->config.prompt_length);
@@ -365,7 +365,7 @@ void microrl_init(microrl_t *pThis, struct microrl_config *config) {
 	pThis->ring_hist.end = 0;
 	pThis->ring_hist.cur = 0;
 #endif
-#ifdef MICRORL_USE_ESC_SEQ
+#if MICRORL_USE_ESC_SEQ
 	pThis->escape = 0;
 #endif
 	pThis->cmdlen = 0;
@@ -375,7 +375,7 @@ void microrl_init(microrl_t *pThis, struct microrl_config *config) {
 		pThis->config.prompt_str = MICRORL_PROMPT_DEFAULT;
 		pThis->config.prompt_length = MICRORL_PROMPT_LEN;
 	}
-#ifdef MICRORL_ENABLE_INIT_PROMPT
+#if MICRORL_ENABLE_INIT_PROMPT
 	print_prompt(pThis);
 #endif
 }
@@ -397,7 +397,7 @@ void microrl_set_execute_callback(microrl_t *pThis,
 								  int (*execute)(void *, int, char **)) {
 	pThis->config.execute = execute;
 }
-#ifdef MICRORL_USE_CTRL_C
+#if MICRORL_USE_CTRL_C
 //*****************************************************************************
 void microrl_set_sigint_callback(microrl_t *pThis,
 								 void (*sigint)(void *userdata)) {
@@ -417,7 +417,7 @@ static void hist_search(microrl_t *pThis, int dir) {
 }
 #endif
 
-#ifdef MICRORL_USE_ESC_SEQ
+#if MICRORL_USE_ESC_SEQ
 //*****************************************************************************
 // handling escape sequences
 static int escape_process(microrl_t *pThis, char ch) {
@@ -616,7 +616,7 @@ static void new_line_handler(microrl_t *pThis, bool execute) {
 //*****************************************************************************
 
 void microrl_insert_char(microrl_t *pThis, int ch) {
-#ifdef MICRORL_USE_ESC_SEQ
+#if MICRORL_USE_ESC_SEQ
 	if (pThis->escape) {
 		if (escape_process(pThis, ch))
 			pThis->escape = 0;
@@ -661,7 +661,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 #endif
 		//-----------------------------------------------------
 		case KEY_ESC:
-#ifdef MICRORL_USE_ESC_SEQ
+#if MICRORL_USE_ESC_SEQ
 			pThis->escape = 1;
 #endif
 			break;
@@ -748,7 +748,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 			break;
 		//-----------------------------------------------------
 		case KEY_ETX:
-#ifdef MICRORL_USE_CTRL_C
+#if MICRORL_USE_CTRL_C
 			if (pThis->pending_execution) {
 				if (pThis->config.sigint != NULL)
 					pThis->config.sigint(pThis->config.userdata);
@@ -775,7 +775,7 @@ void microrl_insert_char(microrl_t *pThis, int ch) {
 
 			break;
 		}
-#ifdef MICRORL_USE_ESC_SEQ
+#if MICRORL_USE_ESC_SEQ
 	}
 #endif
 }

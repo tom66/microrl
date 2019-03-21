@@ -88,7 +88,7 @@
  * decrease code memory.
  * */
 #ifndef MICRORL_USE_ESC_SEQ
-#define MICRORL_USE_ESC_SEQ
+#define MICRORL_USE_ESC_SEQ 1
 #endif
 
 /*
@@ -98,14 +98,14 @@
  * compare Total code size for tune library.
  */
 #ifndef MICRORL_USE_LIBC_STDIO
-#define MICRORL_USE_LIBC_STDIO
+#define MICRORL_USE_LIBC_STDIO 1
 #endif
 
 /*
  * Enable 'interrupt signal' callback, if user press Ctrl+C
  */
 #ifndef MICRORL_USE_CTRL_C
-#define MICRORL_USE_CTRL_C
+#define MICRORL_USE_CTRL_C 1
 #endif
 
 /*
@@ -115,7 +115,7 @@
  * already initialize and ready to print message
  */
 #ifndef MICRORL_ENABLE_INIT_PROMPT
-#define MICRORL_ENABLE_INIT_PROMPT
+#define MICRORL_ENABLE_INIT_PROMPT 1
 #endif
 
 /*
