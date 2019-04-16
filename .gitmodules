@@ -1,3 +1,0 @@
-[submodule "third-party/coding-rules"]
-	path = third-party/coding-rules
-	url = git@gitlab.currymix:workflow/coding-rules.git
