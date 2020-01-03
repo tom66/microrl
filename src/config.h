@@ -5,7 +5,7 @@
 #ifndef MICRORL_CONFIG_H_
 #define MICRORL_CONFIG_H_
 
-#define MICRORL_LIB_VER "1.5.1"
+#define MICRORL_LIB_VER "1.5.1-stm32f0_fork"
 
 /******************************* CONFIG SECTION *******************************/
 #ifdef MICRORL_INCLUDE_CONFIG_H
@@ -37,11 +37,9 @@
  * you prompt, for example this prompt will green color (if you terminal
  * supports color)
  */
-//#define MICRORL_PROMPT_DEFAULT "\033[32mIRin >\033[0m "	// green color
 #ifndef MICRORL_PROMPT_DEFAULT
-#define MICRORL_PROMPT_DEFAULT "\033[32mIRin >\033[0m " // green color
+#define MICRORL_PROMPT_DEFAULT "\033[97mIRin >\033[0m " // white color
 #endif
-//#define MICRORL_PROMPT_DEFAULT "IRin > "
 
 /*
  * Define prompt text (without ESC sequence, only text) prompt length, it needs
@@ -59,7 +57,7 @@
  * define.
  */
 #ifndef MICRORL_USE_COMPLETE
-#define MICRORL_USE_COMPLETE 1
+#define MICRORL_USE_COMPLETE 0
 #endif
 
 /*
@@ -79,7 +77,7 @@
  * devices. Overhead is 2 char on each saved line
  */
 #ifndef MICRORL_RING_HISTORY_LEN
-#define MICRORL_RING_HISTORY_LEN 64
+#define MICRORL_RING_HISTORY_LEN 254
 #endif
 
 /*
