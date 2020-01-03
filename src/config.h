@@ -136,6 +136,19 @@
 #error "You must define new line symbol."
 #endif
 
+/*
+ * Implementation of printf and snprintf functions. These can be pointed
+ * to the C standard printf/snprintf, or to custom functions for output over
+ * peripherals not supported via stdout pipe.
+ */
+#ifndef PRINTF_FUNCTION
+#define PRINTF_FUNCTION(fmt, ...)		uart_printf(fmt, ...)
+#endif
+
+#ifndef SNPRINTF_FUNCTION
+#define SNPRINTF_FUNCTION(fmt, len, ...)	uart_snprintf(fmt, len, ...)
+#endif
+
 /***************************** END CONFIG SECTION *****************************/
 
 #if MICRORL_RING_HISTORY_LEN > 256
