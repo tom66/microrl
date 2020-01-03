@@ -72,28 +72,28 @@ BUGS and TODO:
 //*****************************************************************************
 // print buffer content on screen
 static void print_hist(ring_history_t *pThis) {
-	printf("\n");
+	PRINTF_FUNCTION("\n");
 	for (int i = 0; i < MICRORL_RING_HISTORY_LEN; i++) {
 		if (i == pThis->begin)
-			printf("b");
+			PRINTF_FUNCTION("b");
 		else
-			printf(" ");
+			PRINTF_FUNCTION(" ");
 	}
-	printf("\n");
+	PRINTF_FUNCTION("\n");
 	for (int i = 0; i < MICRORL_RING_HISTORY_LEN; i++) {
 		if (isalpha(pThis->ring_buf[i]))
-			printf("%c", pThis->ring_buf[i]);
+			PRINTF_FUNCTION("%c", pThis->ring_buf[i]);
 		else
-			printf("%d", pThis->ring_buf[i]);
+			PRINTF_FUNCTION("%d", pThis->ring_buf[i]);
 	}
-	printf("\n");
+	PRINTF_FUNCTION("\n");
 	for (int i = 0; i < MICRORL_RING_HISTORY_LEN; i++) {
 		if (i == pThis->end)
-			printf("e");
+			PRINTF_FUNCTION("e");
 		else
-			printf(" ");
+			PRINTF_FUNCTION(" ");
 	}
-	printf("\n");
+	PRINTF_FUNCTION("\n");
 }
 #endif
 
@@ -299,9 +299,9 @@ static void terminal_move_cursor(microrl_t *pThis, int offset) {
 	};
 #if MICRORL_USE_LIBC_STDIO
 	if (offset > 0) {
-		snprintf(str, 16, "\033[%dC", offset);
+		SNPRINTF_FUNCTION(str, 16, "\033[%dC", offset);
 	} else if (offset < 0) {
-		snprintf(str, 16, "\033[%dD", -(offset));
+		SNPRINTF_FUNCTION(str, 16, "\033[%dD", -(offset));
 	}
 #else
 	char *endstr;
@@ -322,7 +322,7 @@ static void terminal_move_cursor(microrl_t *pThis, int offset) {
 static void terminal_reset_cursor(microrl_t *pThis) {
 	char str[16];
 #if MICRORL_USE_LIBC_STDIO
-	snprintf(str, 16, "\033[%dD\033[%dC",
+	SNPRINTF_FUNCTION(str, 16, "\033[%dD\033[%dC",
 			 MICRORL_COMMAND_LINE_LEN + pThis->config.prompt_length + 2,
 			 pThis->config.prompt_length);
 #else
