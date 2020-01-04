@@ -265,7 +265,11 @@ inline static void terminal_backspace(microrl_t *pThis) {
 
 //*****************************************************************************
 inline static void terminal_newline(microrl_t *pThis) {
+#if MICROL_PUTTY_NEWLINES == 1
+	pThis->config.print("\r\n");
+#else
 	pThis->config.print(MICRORL_ENDL);
+#endif
 }
 
 #if !MICRORL_USE_LIBC_STDIO
@@ -299,9 +303,9 @@ static void terminal_move_cursor(microrl_t *pThis, int offset) {
 	};
 #if MICRORL_USE_LIBC_STDIO
 	if (offset > 0) {
-		SNPRINTF_FUNCTION(str, 16, "\033[%dC", offset);
+		snprintf(str, 16, "\033[%dC", offset);
 	} else if (offset < 0) {
-		SNPRINTF_FUNCTION(str, 16, "\033[%dD", -(offset));
+		snprintf(str, 16, "\033[%dD", -(offset));
 	}
 #else
 	char *endstr;
@@ -322,7 +326,7 @@ static void terminal_move_cursor(microrl_t *pThis, int offset) {
 static void terminal_reset_cursor(microrl_t *pThis) {
 	char str[16];
 #if MICRORL_USE_LIBC_STDIO
-	SNPRINTF_FUNCTION(str, 16, "\033[%dD\033[%dC",
+	snprintf(str, 16, "\033[%dD\033[%dC",
 			 MICRORL_COMMAND_LINE_LEN + pThis->config.prompt_length + 2,
 			 pThis->config.prompt_length);
 #else

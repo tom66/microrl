@@ -18,7 +18,7 @@
  * parametrs-1, chars not added to command line.
  */
 #ifndef MICRORL_COMMAND_LINE_LEN
-#define MICRORL_COMMAND_LINE_LEN (1 + 100)
+#define MICRORL_COMMAND_LINE_LEN (1 + 254)
 #endif
 
 /*
@@ -38,7 +38,7 @@
  * supports color)
  */
 #ifndef MICRORL_PROMPT_DEFAULT
-#define MICRORL_PROMPT_DEFAULT "\033[97mIRin >\033[0m " // white color
+#define MICRORL_PROMPT_DEFAULT "\033[97mstm32 >\033[0m " // white color
 #endif
 
 /*
@@ -46,7 +46,7 @@
  * because if you use ESC sequence, it's not possible detect only text length
  */
 #ifndef MICRORL_PROMPT_LEN
-#define MICRORL_PROMPT_LEN 7
+#define MICRORL_PROMPT_LEN 8
 #endif
 
 /*
@@ -121,7 +121,7 @@
  */
 #if !defined(MICRORL_ENDL_CR) && !defined(MICRORL_ENDL_CRLF) &&                \
 	!defined(MICRORL_ENDL_LF) && !defined(MICRORL_ENDL_LFCR)
-#define MICRORL_ENDL_LF
+#define MICRORL_ENDL_CR
 #endif
 
 #if defined(MICRORL_ENDL_CR)
@@ -137,16 +137,21 @@
 #endif
 
 /*
- * Implementation of printf and snprintf functions. These can be pointed
- * to the C standard printf/snprintf, or to custom functions for output over
- * peripherals not supported via stdout pipe.
+ * Set this #define if using a PuTTY serial terminal:  PuTTY expects \r\n 
+ * to terminate lines, but only sends \r when the 'enter' key is pressed, by default.
+ * Ensure the endline mode is set to MICRORL_ENDL_CR if used.
  */
-#ifndef PRINTF_FUNCTION
-#define PRINTF_FUNCTION(fmt, ...)		uart_printf(fmt, ...)
+#ifndef MICROL_PUTTY_NEWLINES
+#define MICROL_PUTTY_NEWLINES 1
 #endif
 
-#ifndef SNPRINTF_FUNCTION
-#define SNPRINTF_FUNCTION(fmt, len, ...)	uart_snprintf(fmt, len, ...)
+/*
+ * Implementation of printf function to UART. This can be pointed
+ * to the C standard printf/snprintf, or to custom functions for 
+ * output over peripherals not supported via stdout pipe.
+ */
+#ifndef PRINTF_FUNCTION
+#define PRINTF_FUNCTION(fmt, ...)		    uart_printf(fmt, ##__VA_ARGS__)
 #endif
 
 /***************************** END CONFIG SECTION *****************************/
